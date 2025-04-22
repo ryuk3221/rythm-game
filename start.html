@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400..900&display=swap" rel="stylesheet">
+  <title>Document</title>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="game--img" style="background-image: url(menu.jpg);"></div>
+    <div class="game--bg"></div>
+    <div class="game">
+      <div class="music-current-time">0000</div>
+      <div class="points-wrapper"><span class="points">0 </span></div>
+      <div class="timer combo">0</div>
+      <button class="btn-start">Начать</button>
+      <div class="game-container">
+        <button class="back-to-menu">Назад</button>
+        <div class="notes-container">
+
+        </div>
+        <div class="buttons">
+          <div data-key="1">S</div>
+          <div data-key="2">D</div>
+          <div data-key="3">F</div>
+          <div data-key="4">J</div>
+          <div data-key="5">K</div>
+          <div data-key="6">L</div>
+
+          <span class="buttons-goal buttons-goal1">
+
+          </span>
+          <span class="buttons-goal buttons-goal2">
+
+          </span>
+          <span class="buttons-goal buttons-goal3">
+
+          </span>
+          <span class="buttons-goal buttons-goal4">
+
+          </span>
+
+          <span class="buttons-goal buttons-goal5">
+
+          </span>
+          <span class="buttons-goal buttons-goal6">
+
+          </span>
+        </div>
+      </div>
+      
+      <audio class="audio1" src="sounds/drum-hitnormal.mp3"></audio>
+      <audio class="music" src="sounds/1.mp3"></audio>
+    </div>
+    <div class="menu">
+      <div class="menu__title">Выберите карту</div>
+      <div class="menu__items">
+        <div class="menu__item" data-map="map1">
+          <img src="map1.jpg" alt="">
+          <div class="menu__item-content">
+            <div class="menu__item-title">Yuumeikyou o Wakatsu Koto</div>
+            <div class="menu__item-subtitle">Сложность 5.5/10</div>
+          </div>
+
+        </div>
+        <div class="menu__item" data-map="map2">
+          <img src="map2.jpg" alt="">
+          <div class="menu__item-content">
+            <div class="menu__item-title">The rise Yousei Teikoku</div>
+            <div class="menu__item-subtitle">Сложность 7/10</div>
+          </div>
+          
+        </div>
+      </div>
+      <div class="menu__btn">Начать</div>
+    </div>
+    <div class="records">
+      <div class="records__title">Мои рекорды</div>
+      <div class="records__items">
+        
+        <!-- <div class="records__item">
+          <span class="number">1.</span>
+          <img src="images/map2.jpg" alt="">
+          <div class="records__item-content">
+            <div class="records__item-title">Yuumeikyou o Wakatsu Koto</div>
+            <div class="records__points-wrapper">Количество очков: <span class="records__points">100343</span></div>
+          </div>
+          <div class="menu__item-statistic">
+              <div class="item-statistic__hits">Кол-во попаданий: 1232</div>
+              <div class="item-statistic__hits">Кол-во промахов: 0</div>
+            </div>
+        </div> -->
+      </div>
+    </div>
+  </div>
+  <div class="pause-popup">
+    <div class="pause-popup__content">
+      <button class="pause-popup__btn btn-continue">Продолжить</button>
+      <button class="pause-popup__btn btn-retry">Заного</button>
+      <button class="pause-popup__btn btn-exit">Выйти</button>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
