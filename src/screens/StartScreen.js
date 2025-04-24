@@ -16,7 +16,6 @@ class StartScreen {
       <div class="menu-music">
         <div class="menu-music__text">
           <div class="menu-music__name">Yuumeikyou o Wakatsu Kotoi</div>
-          <div class="menu-music__author">Kush</div>
         </div>
         <div class="menu-music__controls">
           <button class="menu-music__play">
@@ -36,7 +35,7 @@ class StartScreen {
             </svg>
           </button>
         </div>
-        <input type="range" class="menu-music__progres-bar" value="50" min="0" max="100">
+        <input type="range" class="menu-music__progres-bar" value="0" min="0" max="100">
       </div>
       <div class="menu-frame__bottom">
         <a class="menu-frame__bottom-link" href="https://github.com/ryuk3221">
@@ -54,8 +53,6 @@ class StartScreen {
 
   constructor(element) {
     this.element = element;
-
-    this.render();
   }
 
   menuAnimate() {

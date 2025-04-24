@@ -1511,3 +1511,47 @@ a {
 canvas {
   background-color: #000;
 }
+
+.start-popup {
+  width: 100vw;
+  height: 100vh;
+  background-color: #13181e;
+
+  padding: 150px 0;
+}
+
+.start-popup__content {
+  padding: 20px;
+  border-radius: 24px;
+  max-width: 600px;
+  margin: 0px auto;
+  background-color: #414e5e;
+  text-align: center;
+}
+
+.start-popup__icon {
+  font-size: 65px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.start-popup__text {
+  font-size: 20px;
+  line-height: 25px;
+  margin-bottom: 20px;
+}
+
+.start-popup__title {
+  font-size: 25px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.start-popup__btn {
+  padding: 5px 0px;
+  width: 100px;
+  border-radius: 8px;
+  color: #fff;
+  border: 1px solid #fff;
+  font-size: 22px;
+}
