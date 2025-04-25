@@ -7,7 +7,9 @@ export const maps = [
     notes: [1000],
     imgPath: './map1.jpg',
     musicPath: './sounds/1.mp3',
-    previewTiming: 161
+    previewTiming: 161,
+    bpm: '121-151',
+    duration: '3:34'
   },
   {
     id: 2,
@@ -17,7 +19,9 @@ export const maps = [
     notes: [1000],
     imgPath: './map1.jpg',
     musicPath: './sounds/1.mp3',
-    previewTiming: 161
+    previewTiming: 161,
+    bpm: '121-151',
+    duration: '3:34'
   },
   {
     id: 3,
@@ -27,7 +31,9 @@ export const maps = [
     notes: [1000],
     imgPath: './map2.jpg',
     musicPath: './sounds/2.mp3',
-    previewTiming: 123.5
+    previewTiming: 123.5,
+    bpm: '210',
+    duration: '4:16'
   },
   {
     id: 4,
@@ -37,7 +43,9 @@ export const maps = [
     notes: [1000],
     imgPath: './map2.jpg',
     musicPath: './sounds/2.mp3',
-    previewTiming: 123.5
+    previewTiming: 123.5,
+    bpm: '210',
+    duration: '4:16'
   },
   {
     id: 5,
@@ -47,6 +55,8 @@ export const maps = [
     notes: [1000],
     imgPath: './map3.jpg',
     musicPath: './sounds/3.mp3',
-    previewTiming: 193
+    previewTiming: 193,
+    bpm: '210',
+    duration: '4:16'
   },
 ];

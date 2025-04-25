@@ -77,6 +77,20 @@ class StartScreen {
       this.menuAnimate();
     }, 50);
   }
+
+  updateMusicProgressBar(music) {
+    if (document.querySelector('.menu-music__progres-bar')) {
+      const progress = document.querySelector('.menu-music__progres-bar');
+      music.addEventListener('timeupdate', () => {
+        const percent = music.currentTime / music.duration * 100;
+        progress.value = percent;
+      });
+    }
+  }
+
+  showMusicName(musicObj) {
+    document.querySelector('.menu-music__name').innerHTML = musicObj.songName;
+  }
 }
 
 export default StartScreen;

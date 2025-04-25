@@ -3,23 +3,23 @@ class MapsScreen {
     <div class="maps-frame">
       <div class="maps-frame__top">
         <div class="maps-frame__map-info">
-          <div class="maps-frame__map-name">Yuumeikyou o Wakatsu Kotoi by Kushi</div>
+          <div class="maps-frame__map-name"></div>
           <div class="maps-frame__maps-props">
             <div class="maps-props__item">
               Длительность:
-              <span class="maps-props__duration">3:34</span>
+              <span class="maps-props__duration"></span>
             </div>
             <div class="maps-props__item">
               Сложность:
-              <span class="maps-props__level">7/10</span>
+              <span class="maps-props__level"></span>
             </div>
             <div class="maps-props__item">
               Количество нот:
-              <span class="maps-props__level">1243</span>
+              <span class="maps-props__amount"></span>
             </div>
             <div class="maps-props__item">
               BPM:
-              <span class="maps-props__level">151</span>
+              <span class="maps-props__bpm"></span>
             </div>
           </div>
         </div>
@@ -255,6 +255,29 @@ class MapsScreen {
     }
 
     document.querySelector(`[data-index="${this.currentMapIndex}"]`).classList.add('maps-list__item--active');
+
+    this.updateMapInfo(this.maps[mapIndex]);
+  }
+
+  updateMapInfo(mapObj) {
+    const mapInfoBox = document.querySelector('.maps-frame__map-info');
+    const mapTitleHtml = document.querySelector('.maps-frame__map-name');
+    const mapDiffHtml = document.querySelector('.maps-props__level');
+    const mapDurationHtml = document.querySelector('.maps-props__duration');
+    const mapAmountNotesHtml = document.querySelector('.maps-props__amount');
+    const mapBpmHtml = document.querySelector('.maps-props__bpm');
+
+    mapInfoBox.classList.remove('maps-frame__map-info--show');
+
+    mapTitleHtml.innerHTML = mapObj.title;
+    mapDiffHtml.innerHTML = `${mapObj.stars}/10`;
+    mapDurationHtml.innerHTML = mapObj.duration;
+    mapAmountNotesHtml.innerHTML = mapObj.notes.length;
+    mapBpmHtml.innerHTML = mapObj.bpm;
+
+    setTimeout(() => {
+      mapInfoBox.classList.add('maps-frame__map-info--show');
+    }, 50);
   }
 }
 

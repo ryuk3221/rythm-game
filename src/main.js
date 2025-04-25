@@ -4,7 +4,7 @@ import MapsScreen from './screens/MapsScreen';
 import GameScreen from './screens/GameScreen';
 import { maps } from './maps-list';
 import { DEFAULT_MUSIC_VOLUME } from './constants';
-import { updateMusicProgressBar } from './functions';
+
 
 //главный html элемент в котором происходит вся динамика
 const gameWrapper = document.querySelector('.wrapper');
@@ -58,10 +58,10 @@ window.addEventListener('click', event => {
     //рендерю снова стартовый экран
     startScreen.render();
     clickSound.play();
-
+    startScreen.showMusicName(currentMusic);
 
     currentMusic.songObj.addEventListener('timeupdate', () => {
-      updateMusicProgressBar(currentMusic.songObj);
+      startScreen.updateMusicProgressBar(currentMusic.songObj);
     });
   }
 
@@ -111,7 +111,9 @@ window.addEventListener('click', event => {
     currentMusic.songObj.play();
 
     currentMusic.songObj.addEventListener('loadedmetadata', () => {
-      updateMusicProgressBar(currentMusic.songObj);
+      startScreen.updateMusicProgressBar(currentMusic.songObj);
     });
+
+    startScreen.showMusicName(currentMusic);
   }
 });

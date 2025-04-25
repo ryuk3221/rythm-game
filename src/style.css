@@ -116,27 +116,27 @@ button {
   transition: linear 1.5s;
 }
 
-[data-key="2"] {
+[data-column="2"] {
   background-color: #0093c4;
 }
 
-[data-key="5"] {
+[data-column="5"] {
   background-color: #0093c4;
 }
 
-[data-key="3"] {
+[data-column="3"] {
   background-color: #FF7100;
 }
 
-[data-key="4"] {
+[data-column="4"] {
   background-color: #FF7100;
 }
 
-[data-key="1"] {
+[data-column="1"] {
   background-color: #fff;
 }
 
-[data-key="6"] {
+[data-column="6"] {
   background-color: #fff;
 }
 
@@ -1554,4 +1554,17 @@ canvas {
   color: #fff;
   border: 1px solid #fff;
   font-size: 22px;
+}
+
+.maps-frame__map-info {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-20px);
+}
+
+.maps-frame__map-info--show {
+  transition: .20s ease-in-out;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0px);
 }

@@ -6,12 +6,12 @@ class GameScreen {
 
         </div>
         <div class="buttons">
-          <div data-key="1">S</div>
-          <div data-key="2">D</div>
-          <div data-key="3">F</div>
-          <div data-key="4">J</div>
-          <div data-key="5">K</div>
-          <div data-key="6">L</div>
+          <div data-column="1" data-key="KeyS">S</div>
+          <div data-column="2" data-key="KeyD">D</div>
+          <div data-column="3" data-key="KeyF">F</div>
+          <div data-column="4" data-key="KeyJ">J</div>
+          <div data-column="5" data-key="KeyK">K</div>
+          <div data-column="6" data-key="KeyL">L</div>
         </div>
       </div>
       <div class="game-frame__map-duration">
@@ -38,21 +38,23 @@ class GameScreen {
 
   pop = new Audio('../../sounds/drum-hitclap.mp3');
 
-
   constructor(element, currentMapObj = null) {
     this.element = element;
     this.music = null;
-    this.pop.volume = 0.5;
+    this.pop.volume = 0.2;
     this.currentMapObj = currentMapObj;
+    this.keys = {
+      'keyS': false,
+      'keyD': false,
+      'keyF': false,
+      'keyJ': false,
+      'keyK': false,
+      'keyL': false,
+    }
   }
 
   render() {
     this.element.innerHTML = this.html;
-
-    // window.addEventListener('keydown', event => {
-    //   this.pop.currentTime = 0;
-    //   this.pop.play();
-    // });
   }
 
   setCurrentMap(mapObj) {
@@ -63,12 +65,63 @@ class GameScreen {
   //метод запускающий игрвоой процесс
   startGame() {
     this.controls = document.querySelector('.buttons');
-    console.log(this.controls);
+    self = this;
 
     //инициализирую обработчик нажатий 
     window.onkeydown = event => {
-      this.pop.currentTime = 0;
-      this.pop.play();
+
+      if (event.code == 'KeyS' && !self.keys[event.code]) {
+        console.log(event.code);
+        self.controls.querySelector('[data-column="1"]').classList.add('active');
+        self.keys[event.code] = true;
+        self.pop.currentTime = 0;
+        self.pop.play();
+      }
+
+      if (event.code == 'KeyD' && !self.keys[event.code]) {
+        console.log(event.code);
+        self.controls.querySelector('[data-column="2"]').classList.add('active');
+        self.keys[event.code] = true;
+        self.pop.currentTime = 0;
+        self.pop.play();
+      }
+
+      if (event.code == 'KeyF' && !self.keys[event.code]) {
+        console.log(event.code);
+        self.controls.querySelector('[data-column="3"]').classList.add('active');
+        self.keys[event.code] = true;
+        self.pop.currentTime = 0;
+        self.pop.play();
+      }
+
+      if (event.code == 'KeyJ' && !self.keys[event.code]) {
+        console.log(event.code);
+        self.controls.querySelector('[data-column="4"]').classList.add('active');
+        self.keys[event.code] = true;
+        self.pop.currentTime = 0;
+        self.pop.play();
+      }
+
+      if (event.code == 'KeyK' && !self.keys[event.code]) {
+        console.log(event.code);
+        self.controls.querySelector('[data-column="5"]').classList.add('active');
+        self.keys[event.code] = true;
+        self.pop.currentTime = 0;
+        self.pop.play();
+      }
+
+      if (event.code == 'KeyL' && !self.keys[event.code]) {
+        console.log(event.code);
+        self.controls.querySelector('[data-column="6"]').classList.add('active');
+        self.keys[event.code] = true;
+        self.pop.currentTime = 0;
+        self.pop.play();
+      }
+    }
+
+    window.onkeyup = event => {
+      self.keys[event.code] = false;
+      self.controls.querySelector(`[data-key="${event.code}"]`).classList.remove('active');
     }
   }
 }
