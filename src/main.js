@@ -70,6 +70,11 @@ window.addEventListener('click', event => {
     clickSound.play();
     gameScreen.render();
     gameScreen.startGame();
+
+    currentMusic.songObj.pause();
+
+    //инициализирую событие для паузы
+    window.addEventListener('keydown', gameScreen.showPausePopup);
   }
 
   //кликнули на карту

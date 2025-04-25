@@ -39,10 +39,12 @@ class GameScreen {
   pop = new Audio('../../sounds/drum-hitclap.mp3');
 
   constructor(element, currentMapObj = null) {
+    self = this;
     this.element = element;
     this.music = null;
     this.pop.volume = 0.2;
     this.currentMapObj = currentMapObj;
+    this.isPaused = false;
     this.keys = {
       'keyS': false,
       'keyD': false,
@@ -65,7 +67,6 @@ class GameScreen {
   //метод запускающий игрвоой процесс
   startGame() {
     this.controls = document.querySelector('.buttons');
-    self = this;
 
     //инициализирую обработчик нажатий 
     window.onkeydown = event => {
@@ -121,7 +122,24 @@ class GameScreen {
 
     window.onkeyup = event => {
       self.keys[event.code] = false;
-      self.controls.querySelector(`[data-key="${event.code}"]`).classList.remove('active');
+
+      if (self.controls.querySelector(`[data-key="${event.code}"]`)) {
+        self.controls.querySelector(`[data-key="${event.code}"]`).classList.remove('active');
+      }
+    }
+  }
+
+  showPausePopup(event) {
+    if (event.code == 'Escape') {
+      if (!self.isPaused) {
+        document.querySelector('.pause-popup').classList.add('pause-popup-active');
+        self.isPaused = true;
+        console.log(self.isPaused)
+      } else {
+        document.querySelector('.pause-popup').classList.remove('pause-popup-active');
+        self.isPaused = false;
+        console.log(self.isPaused)
+      }
     }
   }
 }
