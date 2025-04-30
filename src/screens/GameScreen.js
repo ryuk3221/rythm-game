@@ -1,9 +1,13 @@
+import { DEFAULT_MUSIC_VOLUME } from "../constants";
+
 class GameScreen {
   html = `
     <div class="game-frame" style='background-image: linear-gradient(86deg, rgba(0,0,0,0.6) 100%, rgba(0,0,0,0.6) 100%), url("images/map1.jpg");'>
       <div class="game-container">
-        <div class="notes-container">
+        <div class="canvas-wrapper">
+          <canvas width="480" height="800">
 
+          </canvas>
         </div>
         <div class="buttons">
           <div data-column="1" data-key="KeyS">S</div>
@@ -42,7 +46,7 @@ class GameScreen {
     self = this;
     this.element = element;
     this.music = null;
-    this.pop.volume = 0.2;
+    this.pop.volume = 0.1;
     this.currentMapObj = currentMapObj;
     this.isPaused = false;
     this.keys = {
@@ -52,11 +56,23 @@ class GameScreen {
       'keyJ': false,
       'keyK': false,
       'keyL': false,
-    }
+    };
+    this.animationId = null;
+    this.activeNotes = [];
   }
 
   render() {
     this.element.innerHTML = this.html;
+    //после рендера разметки, получаю canvas и контекст
+    this.canvas = document.querySelector('canvas');
+    this.ctx = this.canvas.getContext('2d');
+
+    let arr = this.currentMapObj.notes.map(note => {
+      note.y = 0;
+      return note;
+    });
+
+    console.log(arr);
   }
 
   setCurrentMap(mapObj) {
@@ -72,7 +88,6 @@ class GameScreen {
     window.onkeydown = event => {
 
       if (event.code == 'KeyS' && !self.keys[event.code]) {
-        console.log(event.code);
         self.controls.querySelector('[data-column="1"]').classList.add('active');
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
@@ -80,7 +95,6 @@ class GameScreen {
       }
 
       if (event.code == 'KeyD' && !self.keys[event.code]) {
-        console.log(event.code);
         self.controls.querySelector('[data-column="2"]').classList.add('active');
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
@@ -88,7 +102,6 @@ class GameScreen {
       }
 
       if (event.code == 'KeyF' && !self.keys[event.code]) {
-        console.log(event.code);
         self.controls.querySelector('[data-column="3"]').classList.add('active');
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
@@ -96,7 +109,6 @@ class GameScreen {
       }
 
       if (event.code == 'KeyJ' && !self.keys[event.code]) {
-        console.log(event.code);
         self.controls.querySelector('[data-column="4"]').classList.add('active');
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
@@ -104,7 +116,6 @@ class GameScreen {
       }
 
       if (event.code == 'KeyK' && !self.keys[event.code]) {
-        console.log(event.code);
         self.controls.querySelector('[data-column="5"]').classList.add('active');
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
@@ -112,7 +123,6 @@ class GameScreen {
       }
 
       if (event.code == 'KeyL' && !self.keys[event.code]) {
-        console.log(event.code);
         self.controls.querySelector('[data-column="6"]').classList.add('active');
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
@@ -127,6 +137,50 @@ class GameScreen {
         self.controls.querySelector(`[data-key="${event.code}"]`).classList.remove('active');
       }
     }
+
+    //запустить рендеринг нот и музыку с задержкой
+    setTimeout(() => {
+      this.currentMapObj.notes.forEach(note => {
+        setTimeout(() => {
+          this.activeNotes.push(note);
+        }, note.delay);
+      });
+
+      this.music.currentTime = 0;
+      this.music.volume = DEFAULT_MUSIC_VOLUME;
+      this.music.play();
+
+      this.renderNotes();
+    }, 2000);
+
+
+  }
+
+  renderNotes() {
+    const fps = 100;
+    let startTime = 0;
+
+    const notesAnimate = (timeStamp) => {
+      if (timeStamp - startTime >= 1000 / fps) {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.activeNotes.forEach((note, index) => {
+          note.y += 12;
+          this.ctx.fillStyle = 'red';
+          this.ctx.beginPath();
+          this.ctx.roundRect(note.column * 80 - 80, note.y, 80, 40, 6);
+          this.ctx.fill();
+        });
+
+        // Удаление вышедших за границы
+        this.activeNotes = this.activeNotes.filter(note => note.y <= this.canvas.height);
+
+        startTime = timeStamp;
+      }
+
+      this.animationId = requestAnimationFrame(notesAnimate);
+    }
+
+    notesAnimate();
   }
 
   showPausePopup(event) {
@@ -134,11 +188,13 @@ class GameScreen {
       if (!self.isPaused) {
         document.querySelector('.pause-popup').classList.add('pause-popup-active');
         self.isPaused = true;
-        console.log(self.isPaused)
+        self.music.pause();
+        console.log(self.isPaused);
       } else {
         document.querySelector('.pause-popup').classList.remove('pause-popup-active');
         self.isPaused = false;
-        console.log(self.isPaused)
+        self.music.play();
+        console.log(self.isPaused);
       }
     }
   }

@@ -1,3 +1,5 @@
+import { map4 } from "./notes";
+
 export const maps = [
   {
     id: 1,
@@ -40,7 +42,7 @@ export const maps = [
     title: "Yousei Teikoku Hades - The rise",
     difficulty: "Insane",
     stars: 5,
-    notes: [1000],
+    notes: map4,
     imgPath: './map2.jpg',
     musicPath: './sounds/2.mp3',
     previewTiming: 123.5,

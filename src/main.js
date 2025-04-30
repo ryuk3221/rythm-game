@@ -12,7 +12,7 @@ const gameWrapper = document.querySelector('.wrapper');
 //текущая музыка
 let currentMusic = null;
 //индекс текущей карты
-let currentMapIndex = null;
+let currentMapIndex = 0;
 
 //звук клика в меню
 const clickSound = new Audio('./sounds/click.mp3');
@@ -28,7 +28,7 @@ const gameScreen = new GameScreen(gameWrapper);
 
 
 
-//инициализирую события
+//инициализирую события кликов (здесь обработчики кликов для всего приложения)
 window.addEventListener('click', event => {
   //если кликнули на "играть", рендерю компонент со списком карт
   if (event.target.closest('#play-btn')) {
@@ -70,14 +70,16 @@ window.addEventListener('click', event => {
     clickSound.play();
     gameScreen.render();
     gameScreen.startGame();
+    gameScreen.setCurrentMap(maps[currentMapIndex]);
 
     currentMusic.songObj.pause();
+
 
     //инициализирую событие для паузы
     window.addEventListener('keydown', gameScreen.showPausePopup);
   }
 
-  //кликнули на карту
+  //кликнули на выбор карты
   if (event.target.closest('.maps-list__item')) {
     clickSound.play();
     currentMapIndex = Number(event.target.closest('.maps-list__item').dataset.index);
@@ -103,6 +105,7 @@ window.addEventListener('click', event => {
     }
   }
 
+  //кликнули на "начать"
   if (event.target.closest('.start-popup__btn')) {
     startScreen.render();
     //включаю музыку стартового экрана
@@ -120,5 +123,21 @@ window.addEventListener('click', event => {
     });
 
     startScreen.showMusicName(currentMusic);
+  }
+
+  //обработчики кликов на окне паузы-------------
+  //кликнули на кнопку "выйти"
+  if (event.target.closest('.btn-exit')) {
+    //скрываю окно паузы
+    document.querySelector('.pause-popup').classList.remove('pause-popup-active');
+    //меняю состояние паузы
+    gameScreen.isPaused = false;
+    //рендерю экран со списком карт
+    mapsScreen.render();
+
+    currentMusic.songObj.currentTime = gameScreen.music.currentTime;
+    currentMusic.songObj.play();
+
+    window.removeEventListener('keydown', gameScreen.showPausePopup);
   }
 });
