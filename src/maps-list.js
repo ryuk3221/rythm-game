@@ -61,4 +61,16 @@ export const maps = [
     bpm: '210',
     duration: '4:16'
   },
+  {
+    id: 6,
+    title: "Demetori - Dawn of the dead",
+    difficulty: "Insane",
+    stars: 5,
+    notes: [1000],
+    imgPath: './map4.jpg',
+    musicPath: './sounds/4.mp3',
+    previewTiming: 262.15,
+    bpm: '210',
+    duration: '4:16'
+  },
 ];
