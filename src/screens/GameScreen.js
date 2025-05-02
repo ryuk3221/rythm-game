@@ -148,10 +148,10 @@ class GameScreen {
         //сохраняю id таймаута, и пушу данный id в массив, чтобы в дальнейшем отменять текущие таймауты
         let timeoutId = setTimeout(() => {
           this.activeNotes.push(note);
-          // setTimeout(() => {
-          //   this.pop.currentTime = 0;
-          //   this.pop.play();
-          // }, OFFSET);
+          setTimeout(() => {
+            this.pop.currentTime = 0;
+            this.pop.play();
+          }, OFFSET);
         }, note.delay);
         this.timioutIds.push(timeoutId);
       });
@@ -182,16 +182,11 @@ class GameScreen {
             this.ctx.roundRect(note.column * 80 - 80, note.y, 80, 40, 6);
             this.ctx.fill();
 
-            if (note.y >= 760) {
-              this.pop.currentTime = 0;
-              this.pop.play();// Удаление вышедших за границы
-              this.activeNotes = this.activeNotes.filter(note1 => note1.id != note.id);
-            }
           }
         });
 
-        // Удаление вышедших за границы
-        // this.activeNotes = this.activeNotes.filter(note => note.y <= this.canvas.height);
+        //Удаление вышедших за границы
+        this.activeNotes = this.activeNotes.filter(note => note.y <= this.canvas.height);
 
         startTime = timeStamp;
       }
