@@ -132,6 +132,8 @@ window.addEventListener('click', event => {
     document.querySelector('.pause-popup').classList.remove('pause-popup-active');
     //меняю состояние паузы
     gameScreen.isPaused = false;
+    //отменяю анимирование нот
+    cancelAnimationFrame(gameScreen.animationId);
     //рендерю экран со списком карт
     mapsScreen.render();
 

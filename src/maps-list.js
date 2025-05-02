@@ -6,7 +6,7 @@ export const maps = [
     title: "Yuumeikyou o Wakatsu Kotoi by Kushi",
     difficulty: "Easy",
     stars: 2,
-    notes: [1000],
+    notes: [{ delay: 1000, column: 2, id: "0", y: 0 }],
     imgPath: './map1.jpg',
     musicPath: './sounds/1.mp3',
     previewTiming: 161,

@@ -1,4 +1,4 @@
-import { DEFAULT_MUSIC_VOLUME } from "../constants";
+import { DEFAULT_MUSIC_VOLUME, OFFSET } from "../constants";
 
 class GameScreen {
   html = `
@@ -46,7 +46,7 @@ class GameScreen {
     self = this;
     this.element = element;
     this.music = null;
-    this.pop.volume = 0.1;
+    this.pop.volume = 0.2;
     this.currentMapObj = currentMapObj;
     this.isPaused = false;
     this.keys = {
@@ -59,6 +59,7 @@ class GameScreen {
     };
     this.animationId = null;
     this.activeNotes = [];
+    this.timioutIds = [];
   }
 
   render() {
@@ -138,41 +139,59 @@ class GameScreen {
       }
     }
 
-    //запустить рендеринг нот и музыку с задержкой
+    //запустить рендеринг нот и музыку с задержкой для подготовки к игре
     setTimeout(() => {
+      //запускаю цикл анимации нот
+      this.renderNotes();
+      //
       this.currentMapObj.notes.forEach(note => {
-        setTimeout(() => {
+        //сохраняю id таймаута, и пушу данный id в массив, чтобы в дальнейшем отменять текущие таймауты
+        let timeoutId = setTimeout(() => {
           this.activeNotes.push(note);
+          // setTimeout(() => {
+          //   this.pop.currentTime = 0;
+          //   this.pop.play();
+          // }, OFFSET);
         }, note.delay);
+        this.timioutIds.push(timeoutId);
       });
 
-      this.music.currentTime = 0;
-      this.music.volume = DEFAULT_MUSIC_VOLUME;
-      this.music.play();
+      setTimeout(() => {
+        this.music.currentTime = 0;
+        this.music.volume = DEFAULT_MUSIC_VOLUME;
+        this.music.play();
+      }, OFFSET);
 
-      this.renderNotes();
-    }, 2000);
-
-
+     
+    }, 1000);
   }
 
   renderNotes() {
     const fps = 100;
     let startTime = 0;
+    let lastTime = 0;
 
     const notesAnimate = (timeStamp) => {
       if (timeStamp - startTime >= 1000 / fps) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.activeNotes.forEach((note, index) => {
-          note.y += 12;
-          this.ctx.fillStyle = 'red';
-          this.ctx.beginPath();
-          this.ctx.roundRect(note.column * 80 - 80, note.y, 80, 40, 6);
-          this.ctx.fill();
+          if (!this.isPaused) {
+            note.y += 12;
+            this.ctx.fillStyle = 'red';
+            this.ctx.beginPath();
+            this.ctx.roundRect(note.column * 80 - 80, note.y, 80, 40, 6);
+            this.ctx.fill();
+
+            if (note.y >= 760) {
+              this.pop.currentTime = 0;
+              this.pop.play();// Удаление вышедших за границы
+              this.activeNotes = this.activeNotes.filter(note1 => note1.id != note.id);
+            }
+          }
         });
 
         // Удаление вышедших за границы
-        this.activeNotes = this.activeNotes.filter(note => note.y <= this.canvas.height);
+        // this.activeNotes = this.activeNotes.filter(note => note.y <= this.canvas.height);
 
         startTime = timeStamp;
       }
@@ -189,12 +208,25 @@ class GameScreen {
         document.querySelector('.pause-popup').classList.add('pause-popup-active');
         self.isPaused = true;
         self.music.pause();
-        console.log(self.isPaused);
+        //отменяю запланированные тайминги появления нот
+        self.timioutIds.forEach(timeout => {
+          clearTimeout(timeout);
+        });
+        self.timioutIds = [];
       } else {
         document.querySelector('.pause-popup').classList.remove('pause-popup-active');
         self.isPaused = false;
+        //обновляю тайминги появления нот
+        const curentMusicTime = self.music.currentTime * 1000;
+        self.currentMapObj.notes.forEach(note => {
+          if (note.delay >= curentMusicTime + OFFSET) {
+            let timeoutId = setTimeout(() => {
+              self.activeNotes.push(note);
+            }, note.delay - curentMusicTime - OFFSET);
+            self.timioutIds.push(timeoutId);
+          }
+        });
         self.music.play();
-        console.log(self.isPaused);
       }
     }
   }
