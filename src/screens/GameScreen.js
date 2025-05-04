@@ -23,10 +23,10 @@ class GameScreen {
       </div>
       <div class="game-frame__combo">
         <span class="x">х</span>
-        <span class="game-frame__combo-number">12322</span>
+        <span class="game-frame__combo-number">0</span>
       </div>
       <div class="game-frame__points">
-        1233212
+        0
       </div>
       <div class="game-frame__health">
         <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
@@ -46,7 +46,7 @@ class GameScreen {
     self = this;
     this.element = element;
     this.music = null;
-    this.pop.volume = 0.2;
+    this.pop.volume = 0.01;
     this.currentMapObj = currentMapObj;
     this.isPaused = false;
     this.keys = {
@@ -67,13 +67,6 @@ class GameScreen {
     //после рендера разметки, получаю canvas и контекст
     this.canvas = document.querySelector('canvas');
     this.ctx = this.canvas.getContext('2d');
-
-    let arr = this.currentMapObj.notes.map(note => {
-      note.y = 0;
-      return note;
-    });
-
-    console.log(arr);
   }
 
   setCurrentMap(mapObj) {
@@ -93,6 +86,7 @@ class GameScreen {
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
         self.pop.play();
+        self.checkNoteHit();
       }
 
       if (event.code == 'KeyD' && !self.keys[event.code]) {
@@ -143,15 +137,15 @@ class GameScreen {
     setTimeout(() => {
       //запускаю цикл анимации нот
       this.renderNotes();
-      //
+      //запускаю цикл который создает ноту с задержкой согласно таймингу 
       this.currentMapObj.notes.forEach(note => {
         //сохраняю id таймаута, и пушу данный id в массив, чтобы в дальнейшем отменять текущие таймауты
         let timeoutId = setTimeout(() => {
           this.activeNotes.push(note);
-          setTimeout(() => {
-            this.pop.currentTime = 0;
-            this.pop.play();
-          }, OFFSET);
+          // setTimeout(() => {
+          //   this.pop.currentTime = 0;
+          //   this.pop.play();
+          // }, OFFSET);
         }, note.delay);
         this.timioutIds.push(timeoutId);
       });
@@ -185,7 +179,7 @@ class GameScreen {
           }
         });
 
-        //Удаление вышедших за границы
+        //ВУдаление вышедших за границы
         this.activeNotes = this.activeNotes.filter(note => note.y <= this.canvas.height);
 
         startTime = timeStamp;
@@ -224,6 +218,14 @@ class GameScreen {
         self.music.play();
       }
     }
+  }
+
+  //метод которй отслеживает попадание
+  checkNoteHit() {
+    const activeNotesLength = self.activeNotes.length;
+    const pressingTiming = parseFloat(this.music.currentTime.toFixed(3)) * 1000;
+    console.log(activeNotesLength);
+    console.log(pressingTiming);
   }
 }
 
