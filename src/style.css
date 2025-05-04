@@ -1569,3 +1569,19 @@ canvas {
   visibility: visible;
   transform: translateY(0px);
 }
+
+.accuracy {
+  position: absolute;
+  top: 50px;
+  color: #0093c4;
+  font-size: 25px;
+  font-weight: 600;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: .15s linear;
+}
+
+.accuracy--active {
+  font-size: 45px;
+  transition: .05s linear;
+}

@@ -4,6 +4,7 @@ class GameScreen {
   html = `
     <div class="game-frame" style='background-image: linear-gradient(86deg, rgba(0,0,0,0.6) 100%, rgba(0,0,0,0.6) 100%), url("images/map1.jpg");'>
       <div class="game-container">
+        <div class="accuracy">300</div>
         <div class="canvas-wrapper">
           <canvas width="480" height="800">
 
@@ -46,7 +47,7 @@ class GameScreen {
     self = this;
     this.element = element;
     this.music = null;
-    this.pop.volume = 0.01;
+    this.pop.volume = 0.12;
     this.currentMapObj = currentMapObj;
     this.isPaused = false;
     this.keys = {
@@ -67,6 +68,7 @@ class GameScreen {
     //после рендера разметки, получаю canvas и контекст
     this.canvas = document.querySelector('canvas');
     this.ctx = this.canvas.getContext('2d');
+    this.accuracyElement = document.querySelector('.accuracy');
   }
 
   setCurrentMap(mapObj) {
@@ -86,7 +88,7 @@ class GameScreen {
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
         self.pop.play();
-        self.checkNoteHit();
+        self.checkNoteHit(1);
       }
 
       if (event.code == 'KeyD' && !self.keys[event.code]) {
@@ -94,6 +96,7 @@ class GameScreen {
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
         self.pop.play();
+        self.checkNoteHit(2);
       }
 
       if (event.code == 'KeyF' && !self.keys[event.code]) {
@@ -101,6 +104,7 @@ class GameScreen {
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
         self.pop.play();
+        self.checkNoteHit(3);
       }
 
       if (event.code == 'KeyJ' && !self.keys[event.code]) {
@@ -108,6 +112,7 @@ class GameScreen {
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
         self.pop.play();
+        self.checkNoteHit(4);
       }
 
       if (event.code == 'KeyK' && !self.keys[event.code]) {
@@ -115,6 +120,7 @@ class GameScreen {
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
         self.pop.play();
+        self.checkNoteHit(5);
       }
 
       if (event.code == 'KeyL' && !self.keys[event.code]) {
@@ -122,6 +128,7 @@ class GameScreen {
         self.keys[event.code] = true;
         self.pop.currentTime = 0;
         self.pop.play();
+        self.checkNoteHit(6);
       }
     }
 
@@ -180,7 +187,7 @@ class GameScreen {
         });
 
         //ВУдаление вышедших за границы
-        this.activeNotes = this.activeNotes.filter(note => note.y <= this.canvas.height);
+        this.activeNotes = this.activeNotes.filter(note => note.y <= this.canvas.height + 40);
 
         startTime = timeStamp;
       }
@@ -221,11 +228,23 @@ class GameScreen {
   }
 
   //метод которй отслеживает попадание
-  checkNoteHit() {
-    const activeNotesLength = self.activeNotes.length;
+  checkNoteHit(column) {
+    const activeNotesLength = this.activeNotes.length;
     const pressingTiming = parseFloat(this.music.currentTime.toFixed(3)) * 1000;
-    console.log(activeNotesLength);
-    console.log(pressingTiming);
+    let checkedNote;
+
+    for (let i = activeNotesLength - 1; i >= 0; i--) {
+      if (this.activeNotes[i].column == column) {
+        checkedNote = this.activeNotes[i];
+        const timingDifference = Math.abs(pressingTiming - checkedNote.delay);
+        if (timingDifference < 150) {
+          this.accuracyElement.classList.add('accuracy--active');
+          setTimeout(() => {
+            this.accuracyElement.classList.remove('accuracy--active');
+          }, 40);
+        }
+      }
+    }
   }
 }
 
