@@ -1,4 +1,5 @@
 import { DEFAULT_MUSIC_VOLUME, OFFSET } from "../constants";
+import { perfectDifference, normalDifference, badDifference, missDifference } from "../constants";
 
 class GameScreen {
   html = `
@@ -42,12 +43,14 @@ class GameScreen {
   `;
 
   pop = new Audio('../../sounds/drum-hitclap.mp3');
+  comboBreakSound = new Audio('../../sounds/combobreak.mp3');
 
   constructor(element, currentMapObj = null) {
     self = this;
     this.element = element;
     this.music = null;
     this.pop.volume = 0.12;
+    this.comboBreakSound.volume = 0.12;
     this.currentMapObj = currentMapObj;
     this.isPaused = false;
     this.keys = {
@@ -61,6 +64,9 @@ class GameScreen {
     this.animationId = null;
     this.activeNotes = [];
     this.timioutIds = [];
+    this.combo = 0;
+    this.points = 0;
+    this.healts = 10;
   }
 
   render() {
@@ -69,6 +75,8 @@ class GameScreen {
     this.canvas = document.querySelector('canvas');
     this.ctx = this.canvas.getContext('2d');
     this.accuracyElement = document.querySelector('.accuracy');
+    this.comboElement = document.querySelector('.game-frame__combo-number');
+    this.healtsElement = document.querySelector('.healts-progress');
   }
 
   setCurrentMap(mapObj) {
@@ -163,7 +171,7 @@ class GameScreen {
         this.music.play();
       }, OFFSET);
 
-     
+
     }, 1000);
   }
 
@@ -182,12 +190,28 @@ class GameScreen {
             this.ctx.beginPath();
             this.ctx.roundRect(note.column * 80 - 80, note.y, 80, 40, 6);
             this.ctx.fill();
-
           }
         });
 
-        //ВУдаление вышедших за границы
-        this.activeNotes = this.activeNotes.filter(note => note.y <= this.canvas.height + 40);
+        //Удаление вышедших за границы (то есть промах)
+        this.activeNotes.filter((note, index) => {
+          if (note.y >= this.canvas.height + 80) {
+            if (this.combo > 20) {
+              this.comboBreakSound.play();
+            }
+            this.healts--;
+            this.healtsElement.style.width = `${this.healts * 10}%`
+            this.activeNotes.splice(index, 1);
+            this.accuracyElement.classList.add('accuracy--active');
+            this.combo = 0;
+            this.comboElement.innerHTML = this.combo;
+            this.accuracyElement.innerHTML = 0;
+            this.accuracyElement.style.color = 'red';
+            setTimeout(() => {
+              this.accuracyElement.classList.remove('accuracy--active');
+            }, 40);
+          }
+        });
 
         startTime = timeStamp;
       }
@@ -237,14 +261,45 @@ class GameScreen {
       if (this.activeNotes[i].column == column) {
         checkedNote = this.activeNotes[i];
         const timingDifference = Math.abs(pressingTiming - checkedNote.delay);
-        if (timingDifference < 150) {
-          this.accuracyElement.classList.add('accuracy--active');
-          setTimeout(() => {
-            this.accuracyElement.classList.remove('accuracy--active');
-          }, 40);
+        if (timingDifference < 300) {
+          if (timingDifference < perfectDifference) {
+            this.combo++;
+            this.updateInfo(300);
+            this.activeNotes.splice(i, 1);
+            return;
+          }
+          if (timingDifference < normalDifference) {
+            this.combo++;
+            this.updateInfo(100);
+            this.activeNotes.splice(i, 1);
+            return;
+          }
+          if (timingDifference < badDifference) {
+            this.combo++;
+            this.updateInfo(50);
+            this.activeNotes.splice(i, 1);
+            return;
+          }
         }
       }
     }
+  }
+
+  //метод который обнволяет данные после нажатия (комбо, очки, аккуратность текущей ноты)
+  updateInfo(accuracy) {
+    if (accuracy == 300) this.accuracyElement.style.color = '#0093c4';
+    if (accuracy == 100) this.accuracyElement.style.color = '#27c400';
+    if (accuracy == 50) this.accuracyElement.style.color = '#c46f00';
+    this.accuracyElement.classList.add('accuracy--active');
+    this.accuracyElement.innerHTML = accuracy;
+    this.comboElement.classList.add('game-frame__combo-number--active');
+    this.comboElement.innerHTML = this.combo;
+
+
+    setTimeout(() => {
+      this.accuracyElement.classList.remove('accuracy--active');
+      this.comboElement.classList.remove('game-frame__combo-number--active');
+    }, 40);
   }
 }
 
