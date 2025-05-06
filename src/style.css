@@ -1252,6 +1252,7 @@ a {
   height: 615px;
   padding-right: 10px;
   border-radius: 0 0 8px 0;
+  padding-left: 0;
 }
 
 .maps-frame__records-title {
@@ -1259,22 +1260,24 @@ a {
   margin-bottom: 20px;
   font-weight: 500;
   color: #fff;
+  margin-left: 10px;
 }
 
 .maps-frame__records-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
-
+  margin-left: 10px;
 }
 
 .maps-frame__record {
-  border-radius: 8px;
+  border-radius: 6px;
   background-color: rgba(180, 180, 180, 0.25);
   padding: 10px;
   display: flex;
   gap: 15px;
   cursor: pointer;
+  transform: skew(-10deg) !important;
 }
 
 .record__content {

@@ -1,5 +1,5 @@
 import { DEFAULT_MUSIC_VOLUME, OFFSET } from "../constants";
-import { perfectDifference, normalDifference, badDifference, missDifference } from "../constants";
+import { perfectDifference, normalDifference, badDifference } from "../constants";
 
 class GameScreen {
   html = `
@@ -196,11 +196,15 @@ class GameScreen {
         //Удаление вышедших за границы (то есть промах)
         this.activeNotes.filter((note, index) => {
           if (note.y >= this.canvas.height + 80) {
-            if (this.combo > 20) {
+            if (this.combo > 15) {
               this.comboBreakSound.play();
             }
-            this.healts--;
-            this.healtsElement.style.width = `${this.healts * 10}%`
+            if (this.healts >= 1) {
+              this.healts--;
+              this.healtsElement.style.width = `${this.healts * 10}%`
+            } else {
+              //код который будет выполняться когда игрок сфэйлил
+            }
             this.activeNotes.splice(index, 1);
             this.accuracyElement.classList.add('accuracy--active');
             this.combo = 0;
@@ -261,7 +265,7 @@ class GameScreen {
       if (this.activeNotes[i].column == column) {
         checkedNote = this.activeNotes[i];
         const timingDifference = Math.abs(pressingTiming - checkedNote.delay);
-        if (timingDifference < 300) {
+        if (timingDifference < 400) {
           if (timingDifference < perfectDifference) {
             this.combo++;
             this.updateInfo(300);
