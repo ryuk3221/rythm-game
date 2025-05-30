@@ -86,6 +86,10 @@ class GameScreen {
 
   //метод запускающий игрвоой процесс
   startGame() {
+    this.healts = 10;
+    //обнуляю координаты нот
+    this.currentMapObj.notes.forEach(note => note.y = 0);
+    this.activeNotes.length = 0;
     this.controls = document.querySelector('.buttons');
 
     //инициализирую обработчик нажатий 
@@ -204,6 +208,16 @@ class GameScreen {
               this.healtsElement.style.width = `${this.healts * 10}%`
             } else {
               //код который будет выполняться когда игрок сфэйлил
+              //ставлю мызку на паузу
+              this.music.pause();
+              //отменяю запланированные тайминги появления нот
+              self.timioutIds.forEach(timeout => {
+                clearTimeout(timeout);
+              });
+              self.timioutIds = [];
+              self.activeNotes = [];
+              //отображаю окно фейла
+              document.querySelector('.fale-popup').classList.add('fale-popup--show');
             }
             this.activeNotes.splice(index, 1);
             this.accuracyElement.classList.add('accuracy--active');

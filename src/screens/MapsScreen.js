@@ -197,6 +197,8 @@ class MapsScreen {
 
     //выставляю активную карту (по умолчанию первая картка активная)
     this.selectMap(this.currentMapIndex);
+
+    window.onkeydown = null;
   }
 
   //метод который закрашивает звёзды
