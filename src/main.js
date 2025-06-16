@@ -142,4 +142,20 @@ window.addEventListener('click', event => {
 
     window.removeEventListener('keydown', gameScreen.showPausePopup);
   }
+
+  //обработчик клика на окне фэйла
+  //клик на "выйти"
+  if (event.target.closest('.fale-popup-exit')) {
+    document.querySelector('.fale-popup').classList.remove('fale-popup--show');
+    //отменяю анимирование нот
+    cancelAnimationFrame(gameScreen.animationId);
+    //рендерю экран со списком карт
+    mapsScreen.render();
+    currentMusic.songObj.currentTime = gameScreen.music.currentTime;
+    currentMusic.songObj.play();
+
+    window.removeEventListener('keydown', gameScreen.showPausePopup);
+  }
+
+  //клик на "начать заного"
 });
