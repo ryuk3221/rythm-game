@@ -7,7 +7,7 @@ class GameScreen {
       <div class="game-container">
         <div class="accuracy">300</div>
         <div class="canvas-wrapper">
-          <canvas width="480" height="800">
+          <canvas class="game-canvas" width="480" height="800">
 
           </canvas>
         </div>
@@ -67,6 +67,11 @@ class GameScreen {
     this.combo = 0;
     this.points = 0;
     this.healts = 10;
+    this.renderWindow = 3000;  // отображаем только ноты, которые появятся в ближайшие 3 секунды
+    this.appearBeforeHit = 1500; // нота появляется за 1.5 сек до удара
+    this.noteSpeed = 0.7;
+    this.hitLine = 760;
+    this.playedNotes = new Set();
   }
 
   render() {
@@ -77,20 +82,11 @@ class GameScreen {
     this.accuracyElement = document.querySelector('.accuracy');
     this.comboElement = document.querySelector('.game-frame__combo-number');
     this.healtsElement = document.querySelector('.healts-progress');
-  }
 
-  setCurrentMap(mapObj) {
-    this.currentMapObj = mapObj;
-    this.music = new Audio(this.currentMapObj.musicPath);
-  }
-
-  //метод запускающий игрвоой процесс
-  startGame() {
-    this.healts = 10;
-    //обнуляю координаты нот
-    this.currentMapObj.notes.forEach(note => note.y = 0);
-    this.activeNotes.length = 0;
     this.controls = document.querySelector('.buttons');
+
+    //обнуляю координаты нот
+    this.currentMapObj.notes.forEach(note => { if (note.y) note.y = 0; });
 
     //инициализирую обработчик нажатий 
     window.onkeydown = event => {
@@ -104,43 +100,43 @@ class GameScreen {
       }
 
       if (event.code == 'KeyD' && !self.keys[event.code]) {
-        self.controls.querySelector('[data-column="2"]').classList.add('active');
-        self.keys[event.code] = true;
-        self.pop.currentTime = 0;
-        self.pop.play();
-        self.checkNoteHit(2);
+        this.controls.querySelector('[data-column="2"]').classList.add('active');
+        this.keys[event.code] = true;
+        this.pop.currentTime = 0;
+        this.pop.play();
+        this.checkNoteHit(2);
       }
 
       if (event.code == 'KeyF' && !self.keys[event.code]) {
-        self.controls.querySelector('[data-column="3"]').classList.add('active');
-        self.keys[event.code] = true;
-        self.pop.currentTime = 0;
-        self.pop.play();
-        self.checkNoteHit(3);
+        this.controls.querySelector('[data-column="3"]').classList.add('active');
+        this.keys[event.code] = true;
+        this.pop.currentTime = 0;
+        this.pop.play();
+        this.checkNoteHit(3);
       }
 
       if (event.code == 'KeyJ' && !self.keys[event.code]) {
-        self.controls.querySelector('[data-column="4"]').classList.add('active');
-        self.keys[event.code] = true;
-        self.pop.currentTime = 0;
-        self.pop.play();
-        self.checkNoteHit(4);
+        this.controls.querySelector('[data-column="4"]').classList.add('active');
+        this.keys[event.code] = true;
+        this.pop.currentTime = 0;
+        this.pop.play();
+        this.checkNoteHit(4);
       }
 
       if (event.code == 'KeyK' && !self.keys[event.code]) {
-        self.controls.querySelector('[data-column="5"]').classList.add('active');
-        self.keys[event.code] = true;
-        self.pop.currentTime = 0;
-        self.pop.play();
-        self.checkNoteHit(5);
+        this.controls.querySelector('[data-column="5"]').classList.add('active');
+        this.keys[event.code] = true;
+        this.pop.currentTime = 0;
+        this.pop.play();
+        this.checkNoteHit(5);
       }
 
       if (event.code == 'KeyL' && !self.keys[event.code]) {
-        self.controls.querySelector('[data-column="6"]').classList.add('active');
-        self.keys[event.code] = true;
-        self.pop.currentTime = 0;
-        self.pop.play();
-        self.checkNoteHit(6);
+        this.controls.querySelector('[data-column="6"]').classList.add('active');
+        this.keys[event.code] = true;
+        this.pop.currentTime = 0;
+        this.pop.play();
+        this.checkNoteHit(6);
       }
     }
 
@@ -151,94 +147,175 @@ class GameScreen {
         self.controls.querySelector(`[data-key="${event.code}"]`).classList.remove('active');
       }
     }
+  }
 
-    //запустить рендеринг нот и музыку с задержкой для подготовки к игре
-    setTimeout(() => {
-      //запускаю цикл анимации нот
-      this.renderNotes();
-      //запускаю цикл который создает ноту с задержкой согласно таймингу 
-      this.currentMapObj.notes.forEach(note => {
-        //сохраняю id таймаута, и пушу данный id в массив, чтобы в дальнейшем отменять текущие таймауты
-        let timeoutId = setTimeout(() => {
-          this.activeNotes.push(note);
+  setCurrentMap(mapObj) {
+    this.currentMapObj = mapObj;
+    this.music = new Audio(this.currentMapObj.musicPath);
+  }
+
+  //--------новый метод
+  newStartGame = () => {
+    this.music.currentTime = 0;
+    this.music.volume = DEFAULT_MUSIC_VOLUME;
+    this.music.play();
+    this.startTime = performance.now();
+
+    //планирую появление нот в ближайшие 3 сек
+    this.scheduleNotesWindow(); 
+    requestAnimationFrame(this.renderLoop);
+  }
+
+
+  scheduleNotesWindow = () => {
+    const now = performance.now();
+    const currentTime = now - this.startTime;
+
+    self.currentMapObj.notes.forEach(note => {
+      //тайминг появления ноты
+      const appearTime = note.delay - this.appearBeforeHit;
+      const timeUntilAppear = appearTime - currentTime;
+
+      if (timeUntilAppear >= 0 && timeUntilAppear <= this.renderWindow) {
+        if (!this.playedNotes.has(note.id)) {
+          this.playedNotes.add(note.id);
+
+          setTimeout(() => {
+            this.activeNotes.push(note);
+          }, timeUntilAppear);
+
+          // // 👉 Планируем воспроизведение щелчка
+          // const timeUntilHit = note.delay - this.currentTime;
           // setTimeout(() => {
           //   this.pop.currentTime = 0;
           //   this.pop.play();
-          // }, OFFSET);
-        }, note.delay);
-        this.timioutIds.push(timeoutId);
-      });
-
-      setTimeout(() => {
-        this.music.currentTime = 0;
-        this.music.volume = DEFAULT_MUSIC_VOLUME;
-        this.music.play();
-      }, OFFSET);
-
-
-    }, 1000);
-  }
-
-  renderNotes() {
-    const fps = 100;
-    let startTime = 0;
-    let lastTime = 0;
-
-    const notesAnimate = (timeStamp) => {
-      if (timeStamp - startTime >= 1000 / fps) {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.activeNotes.forEach((note, index) => {
-          if (!this.isPaused) {
-            note.y += 12;
-            this.ctx.fillStyle = 'red';
-            this.ctx.beginPath();
-            this.ctx.roundRect(note.column * 80 - 80, note.y, 80, 40, 6);
-            this.ctx.fill();
-          }
-        });
-
-        //Удаление вышедших за границы (то есть промах)
-        this.activeNotes.filter((note, index) => {
-          if (note.y >= this.canvas.height + 80) {
-            if (this.combo > 15) {
-              this.comboBreakSound.play();
-            }
-            if (this.healts >= 1) {
-              this.healts--;
-              this.healtsElement.style.width = `${this.healts * 10}%`
-            } else {
-              //код который будет выполняться когда игрок сфэйлил
-              //ставлю мызку на паузу
-              this.music.pause();
-              //отменяю запланированные тайминги появления нот
-              self.timioutIds.forEach(timeout => {
-                clearTimeout(timeout);
-              });
-              self.timioutIds = [];
-              self.activeNotes = [];
-              //отображаю окно фейла
-              document.querySelector('.fale-popup').classList.add('fale-popup--show');
-            }
-            this.activeNotes.splice(index, 1);
-            this.accuracyElement.classList.add('accuracy--active');
-            this.combo = 0;
-            this.comboElement.innerHTML = this.combo;
-            this.accuracyElement.innerHTML = 0;
-            this.accuracyElement.style.color = 'red';
-            setTimeout(() => {
-              this.accuracyElement.classList.remove('accuracy--active');
-            }, 40);
-          }
-        });
-
-        startTime = timeStamp;
+          // }, timeUntilHit);
+        }
       }
+    });
 
-      this.animationId = requestAnimationFrame(notesAnimate);
-    }
-
-    notesAnimate();
+    // Повторяем каждые 500 мс, чтобы "захватывать" следующий диапазон
+    setTimeout(this.scheduleNotesWindow, 500);
   }
+
+  renderLoop = () => {
+    const now = performance.now();
+    const currentTime = now - self.startTime;
+
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.activeNotes.forEach(note => {
+      const timeToHit = note.delay - currentTime;
+      note.y = this.hitLine - timeToHit * this.noteSpeed;
+
+      this.ctx.fillStyle = 'red';
+      this.ctx.beginPath();
+      this.ctx.roundRect(note.column * 80 - 80, note.y, 80, 40, 6);
+      this.ctx.fill();
+    });
+
+    requestAnimationFrame(this.renderLoop);
+  }
+
+
+
+  //метод запускающий игрвоой процесс
+  // startGame() {
+  //   this.healts = 10;
+
+  //   this.activeNotes.length = 0;
+  //   this.controls = document.querySelector('.buttons');
+
+  //   //запустить рендеринг нот и музыку с задержкой для подготовки к игре
+  //   setTimeout(() => {
+  //     //запускаю цикл анимации нот
+  //     this.renderNotes();
+  //     //запускаю цикл который создает ноту с задержкой согласно таймингу 
+  //     this.currentMapObj.notes.forEach(note => {
+  //       //сохраняю id таймаута, и пушу данный id в массив, чтобы в дальнейшем отменять текущие таймауты
+  //       let timeoutId = setTimeout(() => {
+  //         this.activeNotes.push(note);
+  //         // setTimeout(() => {
+  //         //   this.pop.currentTime = 0;
+  //         //   this.pop.play();
+  //         // }, OFFSET);
+  //       }, note.delay);
+  //       this.timioutIds.push(timeoutId);
+  //     });
+
+  //     setTimeout(() => {
+  //       this.music.currentTime = 0;
+  //       this.music.volume = DEFAULT_MUSIC_VOLUME;
+  //       this.music.play();
+  //     }, OFFSET);
+
+
+  //   }, 1000);
+  // }
+
+  // renderNotes() {
+  //   const fps = 100;
+  //   let startTime = 0;
+  //   let lastTime = 0;
+
+  //   const notesAnimate = (timeStamp) => {
+  //     if (timeStamp - startTime >= 1000 / fps) {
+
+  //       this.activeNotes.forEach((note, index) => {
+  //         if (!this.isPaused) {
+  //           note.y += 12;
+  //           this.ctx.fillStyle = 'red';
+  //           this.ctx.beginPath();
+  //           this.ctx.roundRect(note.column * 80 - 80, note.y, 80, 40, 6);
+  //           this.ctx.fill();
+  //         }
+  //       });
+
+  //       //Удаление вышедших за границы (то есть промах)
+  //       this.activeNotes.filter((note, index) => {
+  //         if (note.y >= this.canvas.height + 80) {
+  //           if (this.combo > 15) {
+  //             this.comboBreakSound.play();
+  //           }
+  //           if (this.healts >= 1) {
+  //             this.healts--;
+  //             this.healtsElement.style.width = `${this.healts * 10}%`
+  //           } else {
+  //             //код который будет выполняться когда игрок сфэйлил
+  //             //ставлю мызку на паузу
+  //             this.music.pause();
+  //             //отменяю запланированные тайминги появления нот
+  //             self.timioutIds.forEach(timeout => {
+  //               clearTimeout(timeout);
+  //             });
+  //             self.timioutIds = [];
+  //             self.activeNotes = [];
+  //             //отображаю окно фейла
+  //             document.querySelector('.fale-popup').classList.add('fale-popup--show');
+  //           }
+  //           this.activeNotes.splice(index, 1);
+  //           this.accuracyElement.classList.add('accuracy--active');
+  //           this.combo = 0;
+  //           this.comboElement.innerHTML = this.combo;
+  //           this.accuracyElement.innerHTML = 0;
+  //           this.accuracyElement.style.color = 'red';
+  //           setTimeout(() => {
+  //             this.accuracyElement.classList.remove('accuracy--active');
+  //           }, 40);
+  //           return;
+  //         }
+
+  //         return note;
+  //       });
+
+  //       startTime = timeStamp;
+  //     }
+
+  //     this.animationId = requestAnimationFrame(notesAnimate);
+  //   }
+
+  //   notesAnimate();
+  // }
 
   showPausePopup(event) {
     if (event.code == 'Escape') {
@@ -272,7 +349,7 @@ class GameScreen {
   //метод которй отслеживает попадание
   checkNoteHit(column) {
     const activeNotesLength = this.activeNotes.length;
-    const pressingTiming = parseFloat(this.music.currentTime.toFixed(3)) * 1000;
+    const pressingTiming = this.music.currentTime * 1000;
     let checkedNote;
 
     for (let i = activeNotesLength - 1; i >= 0; i--) {

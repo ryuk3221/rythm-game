@@ -68,9 +68,9 @@ window.addEventListener('click', event => {
   //кликнули начать играть
   if (event.target.closest('.maps-frame__btn')) {
     clickSound.play();
-    gameScreen.render();
-    gameScreen.startGame();
     gameScreen.setCurrentMap(maps[currentMapIndex]);
+    gameScreen.render();
+    gameScreen.newStartGame();
 
     currentMusic.songObj.pause();
 

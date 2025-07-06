@@ -1,4 +1,5 @@
 import { map4 } from "./notes";
+import { map7 } from "./notes";
 
 export const maps = [
   {
@@ -71,6 +72,18 @@ export const maps = [
     musicPath: './sounds/4.mp3',
     previewTiming: 262.15,
     bpm: '210',
+    duration: '4:16'
+  },
+    {
+    id: 7,
+    title: "Mirabi Frame, Yui Katsuragi - Shokuzai",
+    difficulty: "Extreme",
+    stars: 5,
+    notes: map7,
+    imgPath: './map5.jpg',
+    musicPath: './sounds/5.mp3',
+    previewTiming: 236.4,
+    bpm: '260',
     duration: '4:16'
   },
 ];
