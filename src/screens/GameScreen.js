@@ -13,8 +13,8 @@ class GameScreen {
         </div>
         <div class="buttons">
           <div data-column="1" data-key="KeyS">S</div>
-          <div data-column="2" data-key="KeyD">D</div>
-          <div data-column="3" data-key="KeyF">F</div>
+          <div data-column="2" data-key="KeyN">N</div>
+          <div data-column="3" data-key="KeyM">M</div>
           <div data-column="4" data-key="KeyJ">J</div>
           <div data-column="5" data-key="KeyK">K</div>
           <div data-column="6" data-key="KeyL">L</div>
@@ -54,8 +54,8 @@ class GameScreen {
     this.currentMapObj = currentMapObj;
     this.isPaused = false;
     this.keys = {
-      'keyS': false,
-      'keyD': false,
+      'keyN': false,
+      'keyM': false,
       'keyF': false,
       'keyJ': false,
       'keyK': false,
@@ -99,7 +99,7 @@ class GameScreen {
         self.checkNoteHit(1);
       }
 
-      if (event.code == 'KeyD' && !self.keys[event.code]) {
+      if (event.code == 'KeyN' && !self.keys[event.code]) {
         this.controls.querySelector('[data-column="2"]').classList.add('active');
         this.keys[event.code] = true;
         this.pop.currentTime = 0;
@@ -107,7 +107,7 @@ class GameScreen {
         this.checkNoteHit(2);
       }
 
-      if (event.code == 'KeyF' && !self.keys[event.code]) {
+      if (event.code == 'KeyM' && !self.keys[event.code]) {
         this.controls.querySelector('[data-column="3"]').classList.add('active');
         this.keys[event.code] = true;
         this.pop.currentTime = 0;
