@@ -162,14 +162,14 @@ class GameScreen {
     this.startTime = performance.now();
 
     //планирую появление нот в ближайшие 3 сек
-    this.scheduleNotesWindow(); 
+    this.scheduleNotesWindow();
     requestAnimationFrame(this.renderLoop);
   }
 
 
   scheduleNotesWindow = () => {
     const now = performance.now();
-    const currentTime = now - this.startTime;
+    const currentTime = this.music.currentTime * 1000;
 
     self.currentMapObj.notes.forEach(note => {
       //тайминг появления ноты
@@ -178,10 +178,9 @@ class GameScreen {
 
       if (timeUntilAppear >= 0 && timeUntilAppear <= this.renderWindow) {
         if (!this.playedNotes.has(note.id)) {
-          this.playedNotes.add(note.id);
-
           setTimeout(() => {
             this.activeNotes.push(note);
+            this.playedNotes.add(note.id);
           }, timeUntilAppear);
 
           // // 👉 Планируем воспроизведение щелчка
@@ -200,7 +199,7 @@ class GameScreen {
 
   renderLoop = () => {
     const now = performance.now();
-    const currentTime = now - self.startTime;
+    const currentTime = this.music.currentTime * 1000;
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -213,6 +212,8 @@ class GameScreen {
       this.ctx.roundRect(note.column * 80 - 80, note.y, 80, 40, 6);
       this.ctx.fill();
     });
+
+    this.activeNotes.filter(note => note.y < this.canvas.height + 100);
 
     requestAnimationFrame(this.renderLoop);
   }
