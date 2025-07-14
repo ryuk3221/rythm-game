@@ -100,19 +100,20 @@ class GameScreen {
       }
 
       if (event.code == 'KeyN' && !self.keys[event.code]) {
+        this.checkNoteHit(2);
         this.controls.querySelector('[data-column="2"]').classList.add('active');
         this.keys[event.code] = true;
         this.pop.currentTime = 0;
         this.pop.play();
-        this.checkNoteHit(2);
+
       }
 
       if (event.code == 'KeyM' && !self.keys[event.code]) {
+        this.checkNoteHit(3);
         this.controls.querySelector('[data-column="3"]').classList.add('active');
         this.keys[event.code] = true;
         this.pop.currentTime = 0;
         this.pop.play();
-        this.checkNoteHit(3);
       }
 
       if (event.code == 'KeyJ' && !self.keys[event.code]) {
@@ -169,7 +170,7 @@ class GameScreen {
 
   scheduleNotesWindow = () => {
     const now = performance.now();
-    const currentTime = this.music.currentTime * 1000;
+    const currentTime = now - this.startTime;
 
     self.currentMapObj.notes.forEach(note => {
       //тайминг появления ноты
@@ -199,7 +200,7 @@ class GameScreen {
 
   renderLoop = () => {
     const now = performance.now();
-    const currentTime = this.music.currentTime * 1000;
+    const currentTime = now - self.startTime;
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -350,7 +351,7 @@ class GameScreen {
   //метод которй отслеживает попадание
   checkNoteHit(column) {
     const activeNotesLength = this.activeNotes.length;
-    const pressingTiming = this.music.currentTime * 1000;
+    const pressingTiming = performance.now() - this.startTime;
     let checkedNote;
 
     for (let i = activeNotesLength - 1; i >= 0; i--) {
