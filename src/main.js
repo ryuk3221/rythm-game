@@ -4,7 +4,11 @@ import MapsScreen from './screens/MapsScreen';
 import GameScreen from './screens/GameScreen';
 import { maps } from './maps-list';
 import { DEFAULT_MUSIC_VOLUME } from './constants';
+import FirstScreen from './screens/FirstScreen';
 
+
+//--------------ЗАПУСКАЮ ПРИЛОЖЕНИЕ С ОТОБРАЖЕНИЯ ПРИВЕТСТВУЮЩЕГО "ЭКРАНА"
+FirstScreen.render();
 
 //главный html элемент в котором происходит вся динамика
 const gameWrapper = document.querySelector('.wrapper');
@@ -19,7 +23,7 @@ const clickSound = new Audio('./sounds/click.mp3');
 clickSound.volume = 0.2;
 
 //создаю экземпляр
-const startScreen = new StartScreen(gameWrapper);
+// const startScreen = new StartScreen(gameWrapper);
 
 //создаю экземпляр компонента "список карт"
 const mapsScreen = new MapsScreen(gameWrapper, maps);
@@ -31,27 +35,27 @@ const gameScreen = new GameScreen(gameWrapper);
 //инициализирую события кликов (здесь обработчики кликов для всего приложения)
 window.addEventListener('click', event => {
   //если кликнули на "играть", рендерю компонент со списком карт
-  if (event.target.closest('#play-btn')) {
-    clickSound.play();
-    mapsScreen.render();
+  // if (event.target.closest('#play-btn')) {
+  //   clickSound.play();
+  //   mapsScreen.render();
 
-    if (!currentMapIndex) {
-      mapsScreen.selectMap(0);
+  //   if (!currentMapIndex) {
+  //     mapsScreen.selectMap(0);
 
-      if (currentMusic) {
-        currentMusic.songObj.pause();
-      }
-      //включаю музыку первой карты так как по дефолту она активная
-      currentMusic = {
-        songName: maps[0].title,
-        songObj: new Audio(maps[0].musicPath)
-      };
+  //     if (currentMusic) {
+  //       currentMusic.songObj.pause();
+  //     }
+  //     //включаю музыку первой карты так как по дефолту она активная
+  //     currentMusic = {
+  //       songName: maps[0].title,
+  //       songObj: new Audio(maps[0].musicPath)
+  //     };
 
-      currentMusic.songObj.volume = DEFAULT_MUSIC_VOLUME;
-      currentMusic.songObj.currentTime = maps[0].previewTiming;
-      currentMusic.songObj.play();
-    }
-  }
+  //     currentMusic.songObj.volume = DEFAULT_MUSIC_VOLUME;
+  //     currentMusic.songObj.currentTime = maps[0].previewTiming;
+  //     currentMusic.songObj.play();
+  //   }
+  // }
 
   //кликнули на "назад"
   if (event.target.closest('.maps-frame__back-btn')) {
@@ -106,24 +110,24 @@ window.addEventListener('click', event => {
   }
 
   //кликнули на "начать"
-  if (event.target.closest('.start-popup__btn')) {
-    startScreen.render();
-    //включаю музыку стартового экрана
-    currentMusic = {
-      songName: 'menu-music',
-      songObj: new Audio('./sounds/menu-music.mp3')
-    };
+  // if (event.target.closest('.start-popup__btn')) {
+  // startScreen.render();
+  // //включаю музыку стартового экрана
+  // currentMusic = {
+  //   songName: 'menu-music',
+  //   songObj: new Audio('./sounds/menu-music.mp3')
+  // };
 
-    currentMusic.songObj.volume = DEFAULT_MUSIC_VOLUME;
-    currentMusic.songObj.currentTime = 29.230;
-    currentMusic.songObj.play();
+  // currentMusic.songObj.volume = DEFAULT_MUSIC_VOLUME;
+  // currentMusic.songObj.currentTime = 29.230;
+  // currentMusic.songObj.play();
 
-    currentMusic.songObj.addEventListener('loadedmetadata', () => {
-      startScreen.updateMusicProgressBar(currentMusic.songObj);
-    });
+  // currentMusic.songObj.addEventListener('loadedmetadata', () => {
+  //   startScreen.updateMusicProgressBar(currentMusic.songObj);
+  // });
 
-    startScreen.showMusicName(currentMusic);
-  }
+  // startScreen.showMusicName(currentMusic);
+  // }
 
   //обработчики кликов на окне паузы-------------
   //кликнули на кнопку "выйти"

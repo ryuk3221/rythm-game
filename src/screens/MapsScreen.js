@@ -1,5 +1,5 @@
 class MapsScreen {
-  html = `
+  static html = `
     <div class="maps-frame">
       <div class="maps-frame__top">
         <div class="maps-frame__map-info">
@@ -177,9 +177,9 @@ class MapsScreen {
     this.currentMapIndex = 0;
   }
 
-  render() {
+  static render() {
     //рендерю разметку экрана с картами 
-    this.element.innerHTML = this.html;
+    document.querySelector('.wrapper').innerHTML = this.html;
 
     //инициализирую слайдер карт
     const slider = new Swiper('.maps-frame__list', {

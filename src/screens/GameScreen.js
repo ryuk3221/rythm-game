@@ -2,7 +2,7 @@ import { DEFAULT_MUSIC_VOLUME, OFFSET } from "../constants";
 import { perfectDifference, normalDifference, badDifference } from "../constants";
 
 class GameScreen {
-  html = `
+  static html = `
     <div class="game-frame" style='background-image: linear-gradient(86deg, rgba(0,0,0,0.6) 100%, rgba(0,0,0,0.6) 100%), url("images/map1.jpg");'>
       <div class="game-container">
         <div class="accuracy">300</div>
@@ -74,8 +74,8 @@ class GameScreen {
     this.playedNotes = new Set();
   }
 
-  render() {
-    this.element.innerHTML = this.html;
+  static render() {
+    document.querySelector('.wrapper').innerHTML = this.html;
     //после рендера разметки, получаю canvas и контекст
     this.canvas = document.querySelector('canvas');
     this.ctx = this.canvas.getContext('2d');
@@ -214,7 +214,23 @@ class GameScreen {
       this.ctx.fill();
     });
 
-    this.activeNotes.filter(note => note.y < this.canvas.height + 100);
+    this.activeNotes = this.activeNotes.filter(note => {
+      if (note.y > this.canvas.height + 100) {
+        if (this.combo >= 15) {
+          this.comboBreakSound.play();
+        }
+        this.accuracyElement.classList.add('accuracy--active');
+        this.combo = 0;
+        this.comboElement.innerHTML = this.combo;
+        this.accuracyElement.innerHTML = 0;
+        this.accuracyElement.style.color = 'red';
+        setTimeout(() => {
+          this.accuracyElement.classList.remove('accuracy--active');
+        }, 40);
+      }
+
+      return note.y < this.canvas.height + 100;
+    });
 
     requestAnimationFrame(this.renderLoop);
   }
@@ -348,38 +364,48 @@ class GameScreen {
     }
   }
 
-  //метод которй отслеживает попадание
-  checkNoteHit(column) {
-    const activeNotesLength = this.activeNotes.length;
-    const pressingTiming = performance.now() - this.startTime;
-    let checkedNote;
+  getScoreForTimingDiff(diff) {
+    if (diff <= perfectDifference) return 300;
+    if (diff <= normalDifference) return 100;
+    if (diff <= badDifference) return 50;
+    return 0; // Промах
+  }
 
-    for (let i = activeNotesLength - 1; i >= 0; i--) {
-      if (this.activeNotes[i].column == column) {
-        checkedNote = this.activeNotes[i];
-        const timingDifference = Math.abs(pressingTiming - checkedNote.delay);
-        if (timingDifference < 400) {
-          if (timingDifference < perfectDifference) {
-            this.combo++;
-            this.updateInfo(300);
-            this.activeNotes.splice(i, 1);
-            return;
-          }
-          if (timingDifference < normalDifference) {
-            this.combo++;
-            this.updateInfo(100);
-            this.activeNotes.splice(i, 1);
-            return;
-          }
-          if (timingDifference < badDifference) {
-            this.combo++;
-            this.updateInfo(50);
-            this.activeNotes.splice(i, 1);
-            return;
-          }
-        }
+  checkNoteHit(column) {
+    const pressingTime = performance.now() - this.startTime;
+
+    // Ищем самую близкую ноту в этой колонке
+    let closestNote = null;
+    let closestDiff = Infinity;
+    let noteIndex = -1;
+
+    this.activeNotes.forEach((note, i) => {
+      if (note.column !== column) return;
+
+      const diff = Math.abs(pressingTime - note.delay);
+      if (diff <= badDifference && diff < closestDiff) {
+        closestNote = note;
+        closestDiff = diff;
+        noteIndex = i;
       }
-    }
+    });
+
+    // if (!closestNote) {
+    //   // Промах
+    //   this.combo = 0;
+    //   this.updateInfo(0);
+    //   return;
+    // }
+
+    const score = this.getScoreForTimingDiff(closestDiff);
+
+    if (score > 0) this.combo++;
+    else this.combo = 0;
+
+    this.updateInfo(score);
+
+    // Удаляем только одну конкретную ноту
+    this.activeNotes = this.activeNotes.filter(item => item.id != this.activeNotes[noteIndex].id);
   }
 
   //метод который обнволяет данные после нажатия (комбо, очки, аккуратность текущей ноты)

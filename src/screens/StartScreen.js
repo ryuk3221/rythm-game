@@ -1,5 +1,7 @@
+import MapsScreen from "./MapsScreen";
+
 class StartScreen {
-  html = `
+  static html = `
       <div class="menu-frame">
       <!-- particles.js container --> 
       <div id="particles-js"></div> 
@@ -53,11 +55,7 @@ class StartScreen {
     </div>
   `;
 
-  constructor(element) {
-    this.element = element;
-  }
-
-  menuAnimate() {
+  static menuAnimate() {
     if (document.querySelector('.logo')) {
       document.querySelector('.logo').classList.add('logo--active');
     }
@@ -72,12 +70,15 @@ class StartScreen {
     }
   }
 
-  render() {
-    this.element.innerHTML = this.html;
-
+  static render() {
+    document.querySelector('.wrapper').innerHTML = this.html;
+    //после рендера анимирую меню
     setTimeout(() => {
       this.menuAnimate();
     }, 50);
+
+    //инициализирую события клика на данном "экране"
+    this.initEvents();
 
     // particlesJS("particles-js", {
     //   particles: {
@@ -136,7 +137,13 @@ class StartScreen {
     // });
   }
 
-  updateMusicProgressBar(music) {
+  static initEvents = () => {
+    document.querySelector('#play-btn').onclick = () => {
+      MapsScreen.render();
+    }
+  }
+
+  static updateMusicProgressBar(music) {
     if (document.querySelector('.menu-music__progres-bar')) {
       const progress = document.querySelector('.menu-music__progres-bar');
       music.addEventListener('timeupdate', () => {
@@ -146,7 +153,7 @@ class StartScreen {
     }
   }
 
-  showMusicName(musicObj) {
+  static showMusicName(musicObj) {
     document.querySelector('.menu-music__name').innerHTML = musicObj.songName;
   }
 }
