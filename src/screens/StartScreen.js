@@ -140,6 +140,8 @@ class StartScreen {
   static initEvents = () => {
     document.querySelector('#play-btn').onclick = () => {
       MapsScreen.render();
+      window.currentSong.songObj.pause();
+      window.currentSong = {};
     }
   }
 

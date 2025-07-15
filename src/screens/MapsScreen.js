@@ -1,3 +1,8 @@
+import { DEFAULT_MUSIC_VOLUME } from "../constants";
+import { maps } from "../maps-list";
+import StartScreen from "./StartScreen";
+import GameScreen from "./GameScreen";
+
 class MapsScreen {
   static html = `
     <div class="maps-frame">
@@ -171,15 +176,19 @@ class MapsScreen {
     </div>
   `;
 
-  constructor(element, maps = []) {
-    this.element = element;
-    this.maps = maps;
-    this.currentMapIndex = 0;
-  }
+  static currentMapIndex = 0;
+  static maps = maps;
+  static currentSong = null;
+  //звук клика в меню
+  static clickSound = new Audio('./sounds/click.mp3');
 
   static render() {
     //рендерю разметку экрана с картами 
     document.querySelector('.wrapper').innerHTML = this.html;
+
+    this.initEvents();
+
+    this.clickSound.volume = 0.5;
 
     //инициализирую слайдер карт
     const slider = new Swiper('.maps-frame__list', {
@@ -198,11 +207,40 @@ class MapsScreen {
     //выставляю активную карту (по умолчанию первая картка активная)
     this.selectMap(this.currentMapIndex);
 
+    this.playSong();
+
     window.onkeydown = null;
   }
 
+  //инициализирую клики
+  static initEvents() {
+    document.querySelector('.maps-frame__list').addEventListener('click', event => {
+      const { target } = event;
+
+      if (target.closest('.maps-list__item')) {
+        const parent = target.closest('.maps-list__item');
+        const selectedMapIndex = Number(parent.dataset.index);
+
+        this.selectMap(selectedMapIndex);
+        this.currentMapIndex = selectedMapIndex;
+        this.playSong();
+        this.clickSound.play();
+      }
+    });
+
+    document.querySelector('.maps-frame__back-btn').onclick = () => {
+      this.clickSound.play();
+      StartScreen.render();
+    };
+
+    document.querySelector('.maps-frame__btn').onclick = () => {
+      this.clickSound.play();
+      GameScreen.render();
+    };
+  }
+
   //метод который закрашивает звёзды
-  setMapRating() {
+  static setMapRating() {
     const starsAll = document.querySelectorAll('.stars');
     starsAll.forEach(starsParent => {
       const rate = Number(starsParent.dataset.rate);
@@ -216,37 +254,39 @@ class MapsScreen {
   }
 
   //метод который рендерит доступные карты
-  mapsListRender() {
+  static mapsListRender() {
     const mapsWrapper = document.querySelector('.maps-wrapper');
 
     this.maps.forEach((map, index) => {
       const htmlComponent = `
-        <div class="maps-list__item swiper-slide" id="${map.id}" data-index="${index}">
-            <img src="${map.imgPath}" alt="">
-            <div class="maps-list__item-content">
-                <div class="maps-list__item-title">${map.title}</div>
-                <div class="stars" data-rate="${map.stars}">
-                  <div class="star"></div>
-                  <div class="star"></div>
-                  <div class="star"></div>
-                  <div class="star"></div>
-                  <div class="star"></div>
-                  <div class="star"></div>
-                  <div class="star"></div>
-                  <div class="star"></div>
-                  <div class="star"></div>
-                  <div class="star"></div>
-              </div>
+            <div class="maps-list__item swiper-slide" id="${map.id}" data-index="${index}">
+                <img src="${map.imgPath}" alt="">
+                <div class="maps-list__item-content">
+                    <div class="maps-list__item-title">${map.title}</div>
+                    <div class="stars" data-rate="${map.stars}">
+                        <div class="star"></div>
+                        <div class="star"></div>
+                        <div class="star"></div>
+                        <div class="star"></div>
+                        <div class="star"></div>
+                        <div class="star"></div>
+                        <div class="star"></div>
+                        <div class="star"></div>
+                        <div class="star"></div>
+                        <div class="star"></div>
+                  </div>
+                </div>
             </div>
-        </div>
-      `;
+        `;
 
       mapsWrapper.insertAdjacentHTML('beforeend', htmlComponent);
     });
   }
 
-  selectMap(mapIndex = 0) {
+  static selectMap(mapIndex = 0) {
     this.currentMapIndex = mapIndex;
+    if (this.currentSong) this.currentSong.pause();
+    this.currentSong = new Audio(this.maps[this.currentMapIndex].musicPath);
 
     const mapsFrameElement = document.querySelector('.maps-frame');
     const style = `linear-gradient(86deg, rgba(0,0,0,0.6) 100%, rgba(0,0,0,0.6) 100%), url("${this.maps[mapIndex].imgPath}")`;
@@ -261,7 +301,7 @@ class MapsScreen {
     this.updateMapInfo(this.maps[mapIndex]);
   }
 
-  updateMapInfo(mapObj) {
+  static updateMapInfo(mapObj) {
     const mapInfoBox = document.querySelector('.maps-frame__map-info');
     const mapTitleHtml = document.querySelector('.maps-frame__map-name');
     const mapDiffHtml = document.querySelector('.maps-props__level');
@@ -280,6 +320,12 @@ class MapsScreen {
     setTimeout(() => {
       mapInfoBox.classList.add('maps-frame__map-info--show');
     }, 50);
+  }
+
+  static playSong() {
+    this.currentSong.volume = DEFAULT_MUSIC_VOLUME;
+    this.currentSong.currentTime = this.maps[this.currentMapIndex].previewTiming;
+    this.currentSong.play();
   }
 }
 
