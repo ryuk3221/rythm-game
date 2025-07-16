@@ -1,26 +1,25 @@
 import './style.css';
-import StartScreen from './screens/StartScreen';
-import MapsScreen from './screens/MapsScreen';
-import GameScreen from './screens/GameScreen';
 import { maps } from './maps-list';
-import { DEFAULT_MUSIC_VOLUME } from './constants';
 import FirstScreen from './screens/FirstScreen';
+import { map7 } from './notes';
+
+let dublikats = [];
+
+// for (let i = 0; i < map7.length; i++) {
+//     for (let j = 0; j < map7.length; j++) {
+//         if (i !== j) {
+//             if (map7[i].delay == map7[j].delay && map7[i].column == map7[j].column) {
+//                 dublikats.push(map7[i]);
+//             }
+//         } 
+//     }
+// }
+
+console.log(dublikats);
 
 
 //--------------ЗАПУСКАЮ ПРИЛОЖЕНИЕ С ОТОБРАЖЕНИЯ ПРИВЕТСТВУЮЩЕГО "ЭКРАНА"
 FirstScreen.render();
-
-//главный html элемент в котором происходит вся динамика
-const gameWrapper = document.querySelector('.wrapper');
-
-
-//создаю экземпляр
-// const startScreen = new StartScreen(gameWrapper);
-
-//создаю экземпляр компонента "список карт"
-const mapsScreen = new MapsScreen(gameWrapper, maps);
-//
-const gameScreen = new GameScreen(gameWrapper);
 
 
 

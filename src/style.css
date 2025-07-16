@@ -1571,7 +1571,7 @@ a {
 }
 
 .accuracy--active {
-  font-size: 45px;
+  font-size: 60px;
   transition: .025s ease;
   opacity: 1;
 }

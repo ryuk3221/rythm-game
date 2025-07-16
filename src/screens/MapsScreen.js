@@ -2,6 +2,7 @@ import { DEFAULT_MUSIC_VOLUME } from "../constants";
 import { maps } from "../maps-list";
 import StartScreen from "./StartScreen";
 import GameScreen from "./GameScreen";
+import { getRandomIntInclusive } from "../functions";
 
 class MapsScreen {
   static html = `
@@ -179,64 +180,65 @@ class MapsScreen {
   static currentMapIndex = 0;
   static maps = maps;
   static currentSong = null;
+  static selectedMap = null;
   //звук клика в меню
   static clickSound = new Audio('./sounds/click.mp3');
 
   static render() {
-    //рендерю разметку экрана с картами 
-    document.querySelector('.wrapper').innerHTML = this.html;
+      //рендерю разметку экрана с картами 
+      document.querySelector('.wrapper').innerHTML = this.html;           
 
-    this.initEvents();
+      this.initEvents();
 
-    this.clickSound.volume = 0.5;
+      this.clickSound.volume = 0.5;
 
-    //инициализирую слайдер карт
-    const slider = new Swiper('.maps-frame__list', {
-      slidesPerView: 'auto',
-      spaceBetween: 10,
-      freeMode: true,
-      direction: "vertical"
-    });
+      //инициализирую слайдер карт
+      const slider = new Swiper('.maps-frame__list', {
+        slidesPerView: 'auto',
+        spaceBetween: 10,
+        freeMode: true,
+        direction: "vertical"
+      });
 
-    //рендую слайдер с картами
-    this.mapsListRender();
+      //рендую слайдер с картами
+      this.mapsListRender();
 
-    //отрисовываю количество звёзд
-    this.setMapRating();
+      //отрисовываю количество звёзд
+      this.setMapRating();
 
-    //выставляю активную карту (по умолчанию первая картка активная)
-    this.selectMap(this.currentMapIndex);
+      this.selectMap(getRandomIntInclusive(1, this.maps.length));
 
-    this.playSong();
+      
+      this.firstRender = false;
+    
 
-    window.onkeydown = null;
+      window.onkeydown = null;
   }
 
   //инициализирую клики
   static initEvents() {
-    document.querySelector('.maps-frame__list').addEventListener('click', event => {
-      const { target } = event;
+      document.querySelector('.maps-frame__list').addEventListener('click', event => {
+          const { target } = event;
 
-      if (target.closest('.maps-list__item')) {
-        const parent = target.closest('.maps-list__item');
-        const selectedMapIndex = Number(parent.dataset.index);
+          if (target.closest('.maps-list__item') && !target.closest('.maps-list__item--active')) {
+              const parent = target.closest('.maps-list__item');
+              const id = Number(parent.id);
+              this.clickSound.play();
+              this.selectMap(id);
+          }
+      });
 
-        this.selectMap(selectedMapIndex);
-        this.currentMapIndex = selectedMapIndex;
-        this.playSong();
-        this.clickSound.play();
-      }
-    });
+      document.querySelector('.maps-frame__back-btn').onclick = () => {
+          this.clickSound.play();
+          StartScreen.render();
+      };
 
-    document.querySelector('.maps-frame__back-btn').onclick = () => {
-      this.clickSound.play();
-      StartScreen.render();
-    };
-
-    document.querySelector('.maps-frame__btn').onclick = () => {
-      this.clickSound.play();
-      GameScreen.render();
-    };
+      document.querySelector('.maps-frame__btn').onclick = () => {
+          this.clickSound.play();
+          this.currentSong.pause();
+          GameScreen.setCurrentMap(this.selectedMap);
+          GameScreen.render();
+      };
   }
 
   //метод который закрашивает звёзды
@@ -283,23 +285,32 @@ class MapsScreen {
     });
   }
 
-  static selectMap(mapIndex = 0) {
-    this.currentMapIndex = mapIndex;
-    if (this.currentSong) this.currentSong.pause();
-    this.currentSong = new Audio(this.maps[this.currentMapIndex].musicPath);
+  static selectMap(id) {
+      this.selectedMap = this.maps.find(item => item.id == id);
+      console.log(this.selectedMap);
 
-    const mapsFrameElement = document.querySelector('.maps-frame');
-    const style = `linear-gradient(86deg, rgba(0,0,0,0.6) 100%, rgba(0,0,0,0.6) 100%), url("${this.maps[mapIndex].imgPath}")`;
-    mapsFrameElement.style.backgroundImage = style;
+      if (this.currentSong) this.currentSong.pause();
+      this.currentSong = new Audio(this.selectedMap.musicPath);
 
-    if (document.querySelector('.maps-list__item--active')) {
-      document.querySelector('.maps-list__item--active').classList.remove('maps-list__item--active');
-    }
+      const mapsFrameElement = document.querySelector('.maps-frame');
+      const style = `linear-gradient(86deg, rgba(0,0,0,0.6) 100%, rgba(0,0,0,0.6) 100%), url("${this.selectedMap.imgPath}")`;
+      mapsFrameElement.style.backgroundImage = style;
+      
+      if (document.querySelector('.maps-list__item--active')) {
+          document.querySelector('.maps-list__item--active').classList.remove('maps-list__item--active');
+      }
 
-    document.querySelector(`[data-index="${this.currentMapIndex}"]`).classList.add('maps-list__item--active');
+      document.getElementById(id).classList.add('maps-list__item--active');
 
-    this.updateMapInfo(this.maps[mapIndex]);
+      this.updateMapInfo(this.selectedMap);
+
+      this.playSong();
+      // const findedMap = this.maps.find(item => item.id == id);
+      // if (this.selectedMap.title !== findedMap.title) {
+          
+      // }
   }
+
 
   static updateMapInfo(mapObj) {
     const mapInfoBox = document.querySelector('.maps-frame__map-info');
@@ -324,7 +335,7 @@ class MapsScreen {
 
   static playSong() {
     this.currentSong.volume = DEFAULT_MUSIC_VOLUME;
-    this.currentSong.currentTime = this.maps[this.currentMapIndex].previewTiming;
+    this.currentSong.currentTime = this.selectedMap.previewTiming;
     this.currentSong.play();
   }
 }

@@ -365,11 +365,6 @@ export const map7 = [
     {
         "delay": 22710,
         "column": 2,
-        "id": "168"
-    },
-    {
-        "delay": 22710,
-        "column": 2,
         "id": "170"
     },
     {
@@ -446,11 +441,6 @@ export const map7 = [
         "id": 188,
         "column": 2,
         "delay": 25133
-    },
-    {
-        "delay": 26056,
-        "column": 2,
-        "id": "189"
     },
     {
         "delay": 26460,
@@ -1728,11 +1718,6 @@ export const map7 = [
         "id": "711"
     },
     {
-        "delay": 89517,
-        "column": 2,
-        "id": "712"
-    },
-    {
         "delay": 90267,
         "column": 2,
         "id": "713"
@@ -1993,7 +1978,6 @@ export const map7 = [
         "id": "860"
     }
 ]
-
 
 map7.forEach(item => {
     item.y = 0;
